@@ -1,6 +1,6 @@
 import json
 from os import getenv
-from typing import TypedDict
+from typing import TypedDict, Any
 
 import requests
 
@@ -23,9 +23,9 @@ class StandardReport(TypedDict):
     encouragement: str
 
 
-def to_slack_blocks(report: StandardReport) -> dict:
+def to_slack_blocks(report: StandardReport) -> dict[str, Any]:
     """Convert standard report to Slack blocks format."""
-    blocks = [
+    blocks: list[Any] = [
         {"type": "header", "text": {"type": "plain_text", "text": "📊 Weekly Promptly Analysis", "emoji": True}},
         {"type": "section", "text": {"type": "mrkdwn", "text": "*Executive Summary*"}},
         {"type": "section", "text": {"type": "mrkdwn", "text": report["summary"]}},
