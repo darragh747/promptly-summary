@@ -16,9 +16,6 @@ help_msg = f"""{Style.PNK}
 {Style.GRN}{Style.BLD}Flags{Style.RES}
   {Style.PRP}-h{Style.RES}, {Style.PRP}--help{Style.RES}        Show this help message & quit
   {Style.PRP}-v{Style.RES}, {Style.PRP}--version{Style.RES}     Show program version & quit
-
-{Style.GRN}{Style.BLD}Required Args{Style.RES}
-  {Style.PRP}days{Style.RES}              Get summary for this amount of days back
 """
 
 
@@ -54,9 +51,8 @@ def pver() -> None:
     print(ver_msg)
 
 
-def parse_args() -> int:
+def parse_args() -> None:
     invalid: set[str] = set()
-    days_str: str | None = None
 
     for each in argv[1:]:
         if each in {"-h", "--help"}:
@@ -67,41 +63,16 @@ def parse_args() -> int:
             pver()
             sys_exit(ErrCode.SUCCESS)
 
-        if each.startswith(("--", "-")):
-            invalid.add(each)
-            continue
-
-        if days_str is None:
-            days_str = each
-            continue
-
         invalid.add(each)
 
     if invalid:
         perr("invalid args -- {}".format("/".join(f"{Style.PRP}{arg}{Style.RES}" for arg in invalid)))
-
-    if days_str is None:
-        perr(f"missing required arg -- {Style.PRP}days{Style.RES}")
-
-    if invalid or days_str is None:
         sys_exit(ErrCode.INVALID_ARGS)
 
+
+def fetch_analytics() -> Analytics | None:
     try:
-        days = int(days_str)
-    except ValueError:
-        perr(f"{Style.PRP}days{Style.RES} must be an integer")
-        sys_exit(ErrCode.INVALID_ARGS)
-
-    if days < Constant.MIN_DAYS or days > Constant.MAX_DAYS:
-        perr(f"{Style.PRP}days{Style.RES} must be between {Constant.MIN_DAYS} and {Constant.MAX_DAYS} (inclusive)")
-        sys_exit(ErrCode.INVALID_ARGS)
-
-    return days
-
-
-def fetch_analytics(days: int) -> Analytics | None:
-    try:
-        r = requests.get(Constant.SRC_URL, params={"days": days}, timeout=15)
+        r = requests.get(Constant.SRC_URL, params={"days": Constant.DAYS}, timeout=15)
         r.raise_for_status()
         json = r.json()
         return add_summary(json)

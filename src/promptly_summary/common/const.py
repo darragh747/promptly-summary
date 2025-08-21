@@ -5,5 +5,4 @@ class Constant:
     CLAUDE_MODEL: str = "claude-opus-4-1-20250805"
     MAX_TOK: int = 32_000
     TEMPERATURE: int = 1
-    MIN_DAYS: int = 1
-    MAX_DAYS: int = 50
+    DAYS: int = 7

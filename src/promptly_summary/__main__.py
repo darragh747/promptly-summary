@@ -8,9 +8,9 @@ from promptly_summary.publishers import parse_ai_response, publish_to_dashboard,
 
 
 def main() -> None:
-    days = parse_args()
+    parse_args()
     print(f"{Style.PNK}Attempting to fetch analytics ...{Style.RES}")
-    data = fetch_analytics(days)
+    data = fetch_analytics()
     if data is None:
         perr("no promptly data found!")
         sys_exit(ErrCode.FETCH_ERROR)

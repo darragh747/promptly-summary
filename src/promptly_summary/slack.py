@@ -42,6 +42,8 @@ def publish2slack(slack_msg: str) -> bool:
         except requests.exceptions.RequestException as fallback_e:
             perr(f"fallback also failed -- {fallback_e}")
             return False
+        else:
+            return True
     except requests.exceptions.RequestException as e:
         print(f"failed to publish to Slack -- {e}")
         return False
