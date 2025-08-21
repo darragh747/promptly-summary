@@ -3,6 +3,7 @@ name = "promptly-summary"
 version = "0.1.0"
 description = "Generate promptly summaries with important prompting tips for devs"
 readme = "README.md"
+license = "MIT"
 authors = [
     { name = "darragh747", email = "darragh.luby@intercom.io" }
 ]
