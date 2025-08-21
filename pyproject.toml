@@ -1,0 +1,21 @@
+[project]
+name = "promptly-summary"
+version = "0.1.0"
+description = "Generate promptly summaries with important prompting tips for devs"
+readme = "README.md"
+authors = [
+    { name = "darragh747", email = "darragh.luby@intercom.io" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.64.0",
+    "click>=8.2.1",
+    "requests>=2.32.5",
+]
+
+[project.scripts]
+promptly-summary = "promptly_summary.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
