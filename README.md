@@ -1,4 +1,4 @@
-# promplty-summary
+# promptly-summary
 
 Generate promptly summaries with important prompting tips for devs
 
