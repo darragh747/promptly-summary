@@ -117,7 +117,7 @@ def publish_to_slack(report: StandardReport) -> bool:
         print(f"{Style.YLW}Skipping Slack publish (no SLACK_WEBHOOK configured){Style.RES}")
         return True  # Not a failure, just skipped
 
-    print(f"{Style.PNK}Sending message to Slack...{Style.RES}")
+    print(f"{Style.PNK}Sending message to Slack ...{Style.RES}")
 
     try:
         slack_data = to_slack_blocks(report)

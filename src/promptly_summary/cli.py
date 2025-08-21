@@ -87,10 +87,16 @@ def parse_args() -> int:
         sys_exit(ErrCode.INVALID_ARGS)
 
     try:
-        return int(days_str)
+        days = int(days_str)
     except ValueError:
-        perr(f"{Style.PRP}days{Style.RES} should be an int")
+        perr(f"{Style.PRP}days{Style.RES} must be an integer")
         sys_exit(ErrCode.INVALID_ARGS)
+
+    if days < Constant.MIN_DAYS or days > Constant.MAX_DAYS:
+        perr(f"{Style.PRP}days{Style.RES} must be between {Constant.MIN_DAYS} and {Constant.MAX_DAYS} (inclusive)")
+        sys_exit(ErrCode.INVALID_ARGS)
+
+    return days
 
 
 def fetch_analytics(days: int) -> Analytics | None:
