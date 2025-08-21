@@ -4,8 +4,8 @@ from sys import exit as sys_exit
 
 import requests
 
-from promptly_summary.common._io import Style, perr
 from promptly_summary.common.errors import ErrCode
+from promptly_summary.common.io import Style, perr
 
 
 def publish2slack(slack_msg: str) -> bool:

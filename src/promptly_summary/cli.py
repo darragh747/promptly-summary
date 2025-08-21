@@ -5,8 +5,9 @@ from typing import TypedDict
 import requests
 
 from promptly_summary.__init__ import __version__
-from promptly_summary.common._io import Style, perr
+from promptly_summary.common.const import Constant
 from promptly_summary.common.errors import ErrCode
+from promptly_summary.common.io import Style, perr
 
 help_msg = f"""{Style.PNK}
 {Style.BLD}promptly-summary{Style.RES}
@@ -92,14 +93,14 @@ def parse_args() -> int:
         sys_exit(ErrCode.INVALID_ARGS)
 
 
-def fetch_analytics(base_url: str, days: int) -> Analytics | None:
+def fetch_analytics(days: int) -> Analytics | None:
     try:
-        r = requests.get(f"{base_url}/prompt-history", params={"days": days}, timeout=15)
+        r = requests.get(Constant.SRC_URL, params={"days": days}, timeout=15)
         r.raise_for_status()
         json = r.json()
         return add_summary(json)
     except requests.RequestException as e:
-        perr(e)
+        perr(str(e))
         return None
 
 

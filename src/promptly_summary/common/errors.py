@@ -8,4 +8,5 @@ class ErrCode(IntEnum):
     MISSING_API_KEY = auto()
     MISSING_WEBHOOK = auto()
     SLACK_PUBLISH_ERROR = auto()
-
+    DASHBOARD_PUBLISH_ERROR = auto()
+    PUBLISH_ERROR = auto()

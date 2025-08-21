@@ -3,8 +3,9 @@ from sys import exit as sys_exit
 
 import anthropic
 
-from promptly_summary.common._io import Style, perr
+from promptly_summary.common.const import Constant
 from promptly_summary.common.errors import ErrCode
+from promptly_summary.common.io import Style, perr
 
 SYS_PROMPT = """
 You are a senior system architect analyzing logs for the AI platform Promptly.
@@ -37,117 +38,42 @@ of type AnalyticsWithSummary, ranked by score_improvement.
 
 ### Output Format
 
-You MUST output a valid JSON object formatted for Slack's webhook API. Use separate blocks to prevent text wrapping:
+You MUST output a valid JSON object with the following structure:
 
 ```json
 {
-  "text": "Weekly Promptly Analysis Report",
-  "blocks": [
-    {
-      "type": "header",
-      "text": {
-        "type": "plain_text",
-        "text": "📊 Weekly Promptly Analysis",
-        "emoji": true
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Executive Summary*"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "<A complete, standalone summary sentence - DO NOT wrap mid-sentence>"
-      }
-    },
-    {
-      "type": "divider"
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Common Mistakes in Original Prompts*"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "• <complete mistake 1 - full sentence on one line>\\n• <complete mistake 2 - full sentence on one line>\\n• <complete mistake 3 - full sentence on one line>"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Patterns in Successful Improvements*"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "• <complete pattern 1 - full sentence on one line>\\n• <complete pattern 2 - full sentence on one line>\\n• <complete pattern 3 - full sentence on one line>"
-      }
-    },
-    {
-      "type": "divider"
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Developer Tips* 💡"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "• <complete tip 1 - full sentence on one line>\\n• <complete tip 2 - full sentence on one line>\\n• <complete tip 3 - full sentence on one line>"
-      }
-    },
-    {
-      "type": "divider"
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Impact Analysis* 📈"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "• *Average Original Score:* <numeric value>\\n• *Average Improved Score:* <numeric value>\\n• *Average Score Improvement:* <numeric value>"
-      }
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "_<complete encouraging statement - full sentence on one line>_ 🎯"
-      }
-    }
-  ]
+  "summary": "A complete, standalone executive summary of your findings",
+  "common_mistakes": [
+    "First common mistake in original prompts",
+    "Second common mistake in original prompts",
+    "Third common mistake in original prompts"
+  ],
+  "successful_patterns": [
+    "First pattern in successful improvements",
+    "Second pattern in successful improvements",
+    "Third pattern in successful improvements"
+  ],
+  "developer_tips": [
+    "First actionable tip for developers",
+    "Second actionable tip for developers",
+    "Third actionable tip for developers"
+  ],
+  "metrics": {
+    "avg_original_score": 0.0,
+    "avg_improved_score": 0.0,
+    "avg_score_improvement": 0.0
+  },
+  "encouragement": "A brief, encouraging statement about Promptly's effectiveness"
 }
 ```
 
 ### CRITICAL FORMATTING RULES
 - Output ONLY the JSON object, no markdown code blocks or other formatting
-- Each bullet point MUST be a complete thought on ONE line - NO wrapping mid-sentence
-- Keep each bullet concise enough to fit on a single line in Slack
-- Use \\n ONLY between bullet points, never within them
+- Each array item MUST be a complete thought - NO sentence fragments
+- Keep each item concise and self-contained
+- Use the exact numeric values provided in the analytics for the metrics
 - Ensure all text strings are properly escaped for JSON
-- Use Slack's mrkdwn format: *bold*, _italic_, - for bullets
+- Do NOT include any markdown formatting (no *, _, etc.)
 
 ---
 
@@ -168,7 +94,7 @@ type AnalyticsWithSummary = {
 "avg_improved_score": float
 "avg_score_improvement": float
 };
-"""  # noqa: E501
+"""
 
 
 def send2claude(data: str) -> str:
@@ -182,16 +108,16 @@ def send2claude(data: str) -> str:
     try:
         txt = ""
         with client.messages.stream(
-            model="claude-opus-4-1-20250805",
-            max_tokens=32_000,
-            temperature=1,
+            model=Constant.CLAUDE_MODEL,
+            max_tokens=Constant.MAX_TOK,
+            temperature=Constant.TEMPERATURE,
             system=SYS_PROMPT,
             messages=[{"role": "user", "content": [{"type": "text", "text": str(data)}]}],
         ) as stream:
             for text in stream.text_stream:
                 txt += text
     except anthropic.AuthenticationError:
-        perr("Anthropic auth error -- invalid value for `ANTHROPIC_API_KEY`")
+        perr(f"Anthropic auth error -- invalid value for {Style.PRP}`ANTHROPIC_API_KEY`{Style.RES}")
         sys_exit(ErrCode.MISSING_API_KEY)
 
     return txt
